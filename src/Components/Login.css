@@ -1,0 +1,59 @@
+.container {
+  height: 92vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #001f3f;
+  border: none;
+}
+
+.heading {
+  height: 8vh;
+  background-color: #001f3f;
+  text-align: center;
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  padding: 15px;
+  font-size: 25px;
+}
+
+.heading-text {
+  margin: 20px 0;
+  text-align: center;
+  color: #001f3f;
+}
+
+.card {
+  min-width: 80vw;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #fff;
+  margin-top: -150px !important;
+}
+
+.form-group {
+  width: 100%;
+  min-width: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: rgb(227, 227, 227);
+  font-size: 18px;
+}
+
+.submit {
+  margin-top: 10px;
+  background-color: #001f3f;
+  color: #fff;
+  font-weight: 500;
+}
