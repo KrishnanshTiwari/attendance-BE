@@ -38,7 +38,6 @@ const WebcamDetection = () => {
 
   const handleVideo = async () => {
     if (isLoading) return;
-    setIsLoading(true);
     if (webcamRef.current && webcamRef.current.video.readyState === 4) {
       const video = webcamRef.current.video;
       try {
@@ -55,7 +54,6 @@ const WebcamDetection = () => {
         if (detections.length > 0) captureImage(detections[0].box);
         setFaceRecognized(true);
         setTimeout(() => {
-          setIsLoading(false);
           setFaceRecognized(false);
         }, 5000);
       } catch (error) {
