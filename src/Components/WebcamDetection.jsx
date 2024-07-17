@@ -101,6 +101,7 @@ const WebcamDetection = () => {
   const logout = () => {
     if (window.confirm("Are you sure you want to logout?")) {
       localStorage.removeItem("token");
+      localStorage.removeItem("site-id");
       navigate("/");
     }
   };
@@ -145,9 +146,9 @@ const WebcamDetection = () => {
           ? `"${lastAttend} your attendance was successfully marked"`
           : `"Look into the camera to mark your attendance automatically with face recognition."`}
       </div>
-      <button className="fix-btn">
+      <span className="fix-btn" onClick={() => navigate("/attendances")}>
         <i className="fa-solid fa-list"></i>
-      </button>
+      </span>
       {capturedImage && <img src={capturedImage} alt="Captured face" />}
     </>
   );

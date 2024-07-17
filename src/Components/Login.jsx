@@ -6,6 +6,7 @@ const Login = () => {
   const [formState, setFormState] = useState({
     username: "",
     password: "",
+    site: "",
   });
   const [loggedIn, setLoggedIn] = useState(
     localStorage.getItem("token") !== null
@@ -35,6 +36,7 @@ const Login = () => {
         "token",
         "hbdhfbsgbjdskhiflasdadfkbeshfbesjbfusubkjahiakdnkndkbagsgduyw"
       );
+      localStorage.setItem("site-id", formState.site);
       setLoggedIn(true);
     }
   };
@@ -69,6 +71,23 @@ const Login = () => {
                 placeholder="password"
                 required
               />
+            </div>
+            <div className="form-group">
+              <label htmlFor="site">Select Site</label>
+              <select
+                name="site"
+                id="site"
+                value={formState.site}
+                required
+                onChange={onChange}
+              >
+                <option value="">Select Site</option>
+                <option value="1">site1</option>
+                <option value="2">site2</option>
+                <option value="3">site3</option>
+                <option value="4">site4</option>
+                <option value="5">site5</option>
+              </select>
             </div>
             <div className="form-group">
               <input type="submit" className="submit" value="Sign In" />
