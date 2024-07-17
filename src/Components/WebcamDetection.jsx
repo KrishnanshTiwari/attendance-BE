@@ -120,7 +120,7 @@ const WebcamDetection = () => {
             overflow: "hidden",
           }}
         />
-        {capturedImage != null &&
+        {capturedImage == null &&
           boundingBox.map((box, index) => (
             <div
               key={index}
