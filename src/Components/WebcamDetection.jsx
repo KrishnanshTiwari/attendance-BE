@@ -9,7 +9,6 @@ const WebcamDetection = () => {
   const [boundingBox, setBoundingBox] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [detected, setDetected] = useState(false);
-  const [facesDetected, setFacesDetected] = useState(0);
   const [capturedImage, setCapturedImage] = useState(null);
   const [faceRecognize, setFaceRecognized] = useState(false);
   const [lastAttend, setLastAttend] = useState("Ashish Godiyal");
@@ -37,7 +36,7 @@ const WebcamDetection = () => {
   }, []);
 
   const handleVideo = async () => {
-    if (isLoading) return;
+    if ((isLoading || detected) && capturedImage != null) return;
     if (webcamRef.current && webcamRef.current.video.readyState === 4) {
       const video = webcamRef.current.video;
       try {
@@ -49,12 +48,13 @@ const WebcamDetection = () => {
           })
         );
         setBoundingBox(detections.map((d) => d.box));
-        setDetected(detections.length > 0);
-        setFacesDetected(detections.length);
         if (detections.length > 0) captureImage(detections[0].box);
         setFaceRecognized(true);
+        setDetected(true);
         setTimeout(() => {
           setFaceRecognized(false);
+          setDetected(false);
+          setCapturedImage(null);
         }, 5000);
       } catch (error) {
         console.error("Error detecting faces:", error);
@@ -84,13 +84,13 @@ const WebcamDetection = () => {
   };
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && !detected) {
       const interval = setInterval(() => {
         handleVideo();
-      }, 5000);
+      }, 100);
       return () => clearInterval(interval);
     }
-  }, [isLoading]);
+  }, [isLoading, detected]);
 
   const logout = () => {
     console.log("logout");
@@ -113,7 +113,6 @@ const WebcamDetection = () => {
         <Webcam
           ref={webcamRef}
           forceScreenshotSourceSize
-          mirrored
           videoContainerStyle={{
             position: "relative",
             width: "100vw",
@@ -121,20 +120,21 @@ const WebcamDetection = () => {
             overflow: "hidden",
           }}
         />
-        {boundingBox.map((box, index) => (
-          <div
-            key={index}
-            style={{
-              border: "4px solid #001f3f",
-              position: "absolute",
-              top: box.top,
-              left: box.left,
-              width: box.width,
-              height: box.height,
-              pointerEvents: "none",
-            }}
-          />
-        ))}
+        {capturedImage != null &&
+          boundingBox.map((box, index) => (
+            <div
+              key={index}
+              style={{
+                border: "4px solid #001f3f",
+                position: "absolute",
+                top: box.top,
+                left: box.left,
+                width: box.width,
+                height: box.height,
+                pointerEvents: "none",
+              }}
+            />
+          ))}
       </div>
 
       <div className="info">
