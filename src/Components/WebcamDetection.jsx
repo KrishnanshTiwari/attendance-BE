@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import Webcam from "react-webcam";
 import * as faceapi from "face-api.js";
 import "./Webcam.css";
@@ -10,8 +10,8 @@ const WebcamDetection = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [detected, setDetected] = useState(false);
   const [capturedImage, setCapturedImage] = useState(null);
-  const [faceRecognize, setFaceRecognized] = useState(false);
-  const [lastAttend, setLastAttend] = useState("Ashish Godiyal");
+  const [faceRecognized, setFaceRecognized] = useState(false);
+  const lastAttend = "Ashish Godiyal";
 
   const navigate = useNavigate();
 
@@ -35,10 +35,11 @@ const WebcamDetection = () => {
     loadModels();
   }, []);
 
-  const handleVideo = async () => {
-    if ((isLoading || detected) && capturedImage != null) return;
-    if (webcamRef.current && webcamRef.current.video.readyState === 4) {
-      const video = webcamRef.current.video;
+  const handleVideo = useCallback(async () => {
+    if (isLoading || detected || capturedImage !== null) return;
+
+    const video = webcamRef.current.video;
+    if (video.readyState === 4) {
       try {
         const detections = await faceapi.detectAllFaces(
           video,
@@ -48,26 +49,32 @@ const WebcamDetection = () => {
           })
         );
         setBoundingBox(detections.map((d) => d.box));
-        if (detections.length > 0) captureImage(detections[0].box);
-        setFaceRecognized(true);
-        setDetected(true);
-        setTimeout(() => {
-          setFaceRecognized(false);
-          setDetected(false);
-          setCapturedImage(null);
-        }, 5000);
+
+        if (detections.length > 0) {
+          captureImage(detections[0].box);
+          setFaceRecognized(true);
+          setDetected(true);
+
+          setTimeout(() => {
+            setFaceRecognized(false);
+            setDetected(false);
+            setCapturedImage(null);
+          }, 5000);
+        }
       } catch (error) {
         console.error("Error detecting faces:", error);
       }
     }
-  };
+  }, [isLoading, detected, capturedImage]);
 
   const captureImage = (box) => {
     const video = webcamRef.current.video;
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
+
     canvas.width = box.width;
     canvas.height = box.height;
+
     context.drawImage(
       video,
       box.x,
@@ -85,17 +92,13 @@ const WebcamDetection = () => {
 
   useEffect(() => {
     if (!isLoading && !detected) {
-      const interval = setInterval(() => {
-        handleVideo();
-      }, 100);
+      const interval = setInterval(handleVideo, 100);
       return () => clearInterval(interval);
     }
-  }, [isLoading, detected]);
+  }, [isLoading, detected, handleVideo]);
 
   const logout = () => {
-    console.log("logout");
-    const con = confirm("Are you want to logout?");
-    if (con) {
+    if (window.confirm("Are you sure you want to logout?")) {
       localStorage.removeItem("token");
       navigate("/");
     }
@@ -104,7 +107,7 @@ const WebcamDetection = () => {
   return (
     <>
       <div className="header">
-        <span className="back-btn">BAC भारत</span>{" "}
+        <span className="back-btn">BAC भारत</span>
         <button className="logout-btn" onClick={logout}>
           Logout <i className="fa-solid fa-right-from-bracket"></i>
         </button>
@@ -136,10 +139,9 @@ const WebcamDetection = () => {
             />
           ))}
       </div>
-
       <div className="info">
-        {faceRecognize
-          ? `"${lastAttend} your attendance was successful marked"`
+        {detected
+          ? `"${lastAttend} your attendance was successfully marked"`
           : `"Look into the camera to mark your attendance automatically with face recognition."`}
       </div>
       {capturedImage && <img src={capturedImage} alt="Captured face" />}
