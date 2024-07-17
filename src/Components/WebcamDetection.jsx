@@ -17,6 +17,7 @@ const WebcamDetection = () => {
 
   useEffect(() => {
     const loadModels = async () => {
+      if (!localStorage.getItem("token")) navigate("/");
       try {
         await Promise.all([
           faceapi.nets.tinyFaceDetector.loadFromUri(
@@ -144,6 +145,9 @@ const WebcamDetection = () => {
           ? `"${lastAttend} your attendance was successfully marked"`
           : `"Look into the camera to mark your attendance automatically with face recognition."`}
       </div>
+      <button className="fix-btn">
+        <i className="fa-solid fa-list"></i>
+      </button>
       {capturedImage && <img src={capturedImage} alt="Captured face" />}
     </>
   );
