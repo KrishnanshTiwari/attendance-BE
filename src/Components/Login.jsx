@@ -23,11 +23,16 @@ const Login = () => {
     }
   };
 
-  useEffect(async () => {
-    if (localStorage.getItem("token")) {
-      setLoggedIn(true);
-    }
-    fetchSitesData();
+  useEffect(() => {
+    const checkTokenAndFetchSites = async () => {
+      if (localStorage.getItem("token")) {
+        setLoggedIn(true);
+      } else {
+        await fetchSitesData();
+      }
+    };
+
+    checkTokenAndFetchSites();
   }, []);
 
   useEffect(() => {
@@ -106,7 +111,9 @@ const Login = () => {
               >
                 <option value="">Select Site</option>
                 {sites.map((site) => (
-                  <option value={site.id}>{site.name}</option>
+                  <option key={site.id} value={site.id}>
+                    {site.name}
+                  </option>
                 ))}
               </select>
             </div>
