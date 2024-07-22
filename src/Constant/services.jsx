@@ -34,6 +34,6 @@ export const authUser = async (payload) => {
     return response.data;
   } catch (error) {
     console.error("Error authenticating user:", error);
-    throw error;
+    return error;
   }
 };

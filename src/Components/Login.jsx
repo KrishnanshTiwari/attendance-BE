@@ -9,17 +9,21 @@ const Login = () => {
     password: "",
     site: "",
   });
-  const [loggedIn, setLoggedIn] = useState(
-    localStorage.getItem("token") !== null
-  );
+  const [loggedIn, setLoggedIn] = useState(false);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      setLoggedIn(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (loggedIn) {
       navigate("/webcam");
     }
-  }, [loggedIn]);
+  }, [loggedIn, navigate]);
 
   const onChange = (e) => {
     const { name, value } = e.target;
@@ -29,30 +33,29 @@ const Login = () => {
     }));
   };
 
-  const submitForm = (e) => {
+  const submitForm = async (e) => {
     e.preventDefault();
-    const { username, password } = formState;
-    //if (username === "admin" && password === "123") {
-    //  localStorage.setItem(
-    //    "token",
-    //    "hbdhfbsgbjdskhiflasdadfkbeshfbesjbfusubkjahiakdnkndkbagsgduyw"
-    //  );
-    const res = authUser({ username, password });
-    if (res.status == 200) {
-      alert("authenticated");
-      localStorage.setItem("site-id", formState.site);
-      localStorage.setItem("token", res.jwt);
-    } else if (res.status == 401) {
-      alert("invalid username or password");
-    } else {
-      alert("server error");
+    const { username, password, site } = formState;
+
+    try {
+      const res = await authUser({ username, password });
+      if (!res.username) {
+        alert("Invalid username or password");
+      } else if (res.username === username && res.password === password) {
+        localStorage.setItem("site-id", site);
+        localStorage.setItem("token", res.jwt);
+        setLoggedIn(true);
+      } else {
+        alert("Server error");
+      }
+    } catch (error) {
+      console.error("Error during authentication", error);
     }
-    setLoggedIn(true);
   };
 
   return (
     <>
-      <div className="heading">BAC भारत</div>{" "}
+      <div className="heading">BAC भारत</div>
       <div className="container">
         <div className="card">
           <h1 className="heading-text">LogIn</h1>
