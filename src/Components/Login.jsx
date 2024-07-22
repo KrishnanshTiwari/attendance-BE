@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { authUser } from "../Constant/services";
+import { authUser, getAllSites } from "../Constant/services";
 import "./Login.css";
 
 const Login = () => {
@@ -10,13 +10,24 @@ const Login = () => {
     site: "",
   });
   const [loggedIn, setLoggedIn] = useState(false);
+  const [sites, setSites] = useState([]);
 
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const fetchSitesData = async () => {
+    try {
+      const sitesRes = await getAllSites();
+      setSites(sitesRes);
+    } catch (error) {
+      console.error("Failed to fetch sites:", error);
+    }
+  };
+
+  useEffect(async () => {
     if (localStorage.getItem("token")) {
       setLoggedIn(true);
     }
+    fetchSitesData();
   }, []);
 
   useEffect(() => {
@@ -94,11 +105,9 @@ const Login = () => {
                 onChange={onChange}
               >
                 <option value="">Select Site</option>
-                <option value="1">site1</option>
-                <option value="2">site2</option>
-                <option value="3">site3</option>
-                <option value="4">site4</option>
-                <option value="5">site5</option>
+                {sites.map((site) => (
+                  <option value={site.id}>{site.name}</option>
+                ))}
               </select>
             </div>
             <div className="form-group">
