@@ -1,33 +1,17 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Table, tableFilters } from "@itwin/itwinui-react";
 import TimeRangeFilter from "./TimeRangeFilter";
 import "@itwin/itwinui-react/styles.css";
 import "./Webcam.css";
-
-const data = [
-  {
-    inTime: "",
-    outTime: "",
-    name: "Name1",
-  },
-  {
-    inTime: "",
-    outTime: "",
-    name: "Name2",
-  },
-  {
-    inTime: "",
-    outTime: "",
-    name: "Name3",
-  },
-  {
-    inTime: "",
-    outTime: "",
-    name: "Name4",
-  },
-];
+import { useNavigate } from "react-router-dom";
+import { getAttendances } from "../Constant/services";
 
 function AttendanceList() {
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
+  const [data, setData] = useState([]);
+  const navigate = useNavigate();
   const translatedLabels = useMemo(
     () => ({
       filter: "Filter",
@@ -38,19 +22,15 @@ function AttendanceList() {
     []
   );
 
-  const formatter = useMemo(() => new Intl.DateTimeFormat("en-us"), []);
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await getAttendances(selectedDate);
+      console.log(res);
+      setData(res.results);
+    };
 
-  const formatTime = useCallback((date) => {
-    if (date) {
-      const time = new Date(date).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-      return time;
-    }
-
-    return "";
-  }, []);
+    fetchData();
+  }, [selectedDate]);
 
   const columns = useMemo(
     () => [
@@ -66,10 +46,10 @@ function AttendanceList() {
           },
           {
             Header: "In Time",
-            accessor: (row) => (row.inTime ? row.inTime : ""),
+            accessor: (row) => (row.clock_in ? row.clock_in : ""),
             Cell: (props) => {
-              const time = props.cell.row.original.inTime;
-              return time ? time : "";
+              const time = props.cell.row.original.clock_in;
+              return time ? time : "-";
             },
             Filter: TimeRangeFilter,
             filter: "betweenTime",
@@ -77,19 +57,17 @@ function AttendanceList() {
           },
           {
             Header: "Out Time",
-            accessor: (row) => (row.outTime ? row.outTime : ""),
+            accessor: (row) => (row.clock_out ? row.clock_out : ""),
             Cell: (props) => {
-              const time = props.cell.row.original.outTime;
-              return time ? time : "";
+              const time = props.cell.row.original.clock_out;
+              return time ? time : "-";
             },
-            // Filter: TimeRangeFilter,
-            // filter: "betweenTime",
             maxWidth: 90,
           },
         ],
       },
     ],
-    [translatedLabels, formatTime]
+    [translatedLabels]
   );
 
   const logout = () => {
@@ -100,11 +78,22 @@ function AttendanceList() {
     }
   };
 
+  const betweenTime = (rows, id, filterValue) => {
+    const [min, max] = filterValue;
+    return rows.filter((row) => {
+      const time = row.values[id];
+      return time >= min && time <= max;
+    });
+  };
+
+  const filterTypes = {
+    betweenTime,
+  };
+
   return (
     <div className="contianer">
       <div className="header">
-        <span className="back-btn">
-          {" "}
+        <span className="back-btn" onClick={() => navigate("/webcam")}>
           <i className="fa-solid fa-arrow-left"></i>
         </span>
         <span className="back-btn"> BAC भारत</span>
@@ -113,11 +102,16 @@ function AttendanceList() {
         </button>
       </div>
       <div className="sub-container">
-        <span>Today's Attendances :- {55}</span>
+        <span>Today's Attendances :- {data.length || 0}</span>
       </div>
       <div className="date-container">
         <span> Select Date:-</span>
-        <input className="datepicker" type="date" name="" id="" />
+        <input
+          className="datepicker"
+          type="date"
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+        />
       </div>
       <div className="table-container">
         <Table
@@ -126,6 +120,7 @@ function AttendanceList() {
           emptyTableContent="No data."
           emptyFilteredTableContent="No results found. Clear or try another filter."
           isSortable
+          filterTypes={filterTypes}
         />
       </div>
     </div>

@@ -1,24 +1,39 @@
 import axios from "axios";
 
-const baseurl = "";
+// const baseurl = "https://attendance-app-be.onrender.com";
+const baseurl = "http://localhost:8000";
 
-export const postAttendance = (payload) => {
-  axios
-    .post(`${baseurl}/api/attendance`, payload)
-    .then((res) => console.log(res))
-    .catch((err) => console.log(err));
+export const postAttendance = async (payload) => {
+  try {
+    const response = await axios.post(`${baseurl}/api/add-attendance`, payload);
+    console.log("Response:", response);
+    return response.data;
+  } catch (error) {
+    console.error("Error posting attendance:", error);
+    throw error;
+  }
 };
 
-export const getAllAttendance = () => {
-  axios
-    .get(`${baseurl}/api/attendances`)
-    .then((res) => console.log(res))
-    .catch((err) => console.log(err));
+export const getAttendances = async (selectedDate) => {
+  try {
+    const response = await axios.post(`${baseurl}/api/get-attendances`, {
+      selectedDate,
+    });
+    console.log("Response:", response);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching attendances:", error);
+    throw error;
+  }
 };
 
-export const getUser = (payload) => {
-  axios
-    .post(`${baseurl}/auth`, payload)
-    .then((res) => console.log(res))
-    .catch((err) => console.log(err));
+export const authUser = async (payload) => {
+  try {
+    const response = await axios.post(`${baseurl}/api/auth`, payload);
+    console.log("Response:", response);
+    return response.data;
+  } catch (error) {
+    console.error("Error authenticating user:", error);
+    throw error;
+  }
 };

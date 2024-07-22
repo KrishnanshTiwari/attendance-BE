@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { authUser } from "../Constant/services";
 import "./Login.css";
 
 const Login = () => {
@@ -31,14 +32,22 @@ const Login = () => {
   const submitForm = (e) => {
     e.preventDefault();
     const { username, password } = formState;
-    if (username === "admin" && password === "123") {
-      localStorage.setItem(
-        "token",
-        "hbdhfbsgbjdskhiflasdadfkbeshfbesjbfusubkjahiakdnkndkbagsgduyw"
-      );
+    //if (username === "admin" && password === "123") {
+    //  localStorage.setItem(
+    //    "token",
+    //    "hbdhfbsgbjdskhiflasdadfkbeshfbesjbfusubkjahiakdnkndkbagsgduyw"
+    //  );
+    const res = authUser({ username, password });
+    if (res.status == 200) {
+      alert("authenticated");
       localStorage.setItem("site-id", formState.site);
-      setLoggedIn(true);
+      localStorage.setItem("token", res.jwt);
+    } else if (res.status == 401) {
+      alert("invalid username or password");
+    } else {
+      alert("server error");
     }
+    setLoggedIn(true);
   };
 
   return (

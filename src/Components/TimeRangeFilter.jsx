@@ -7,12 +7,16 @@ const TimeRangeFilter = ({
 }) => {
   const [startTime, setStartTime] = useState(filterValue[0] || "");
   const [endTime, setEndTime] = useState(filterValue[1] || "");
-  console.log(filterValue);
-  const handleStartTimeChange = (e) => setStartTime(e.target.value);
 
+  const handleStartTimeChange = (e) => setStartTime(e.target.value);
   const handleEndTimeChange = (e) => setEndTime(e.target.value);
 
-  const handleFilter = () => setFilter([startTime, endTime]);
+  const handleFilter = () => {
+    const formattedStartTime = startTime.split(":").join(".");
+    const formattedEndTime = endTime.split(":").join(".");
+    setFilter([formattedStartTime, formattedEndTime]);
+  };
+
   const handleClearFilter = () => {
     setFilter([]);
     setStartTime("");
