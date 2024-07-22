@@ -1,129 +1,66 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { authUser, getAllSites } from "../Constant/services";
-import "./Login.css";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { loginUser } from '../Constant/services'; // Adjust the path as needed
+import './Login.css'; // Import the CSS file for styling
 
 const Login = () => {
-  const [formState, setFormState] = useState({
-    username: "",
-    password: "",
-    site: "",
-  });
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [sites, setSites] = useState([]);
-
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const fetchSitesData = async () => {
-    try {
-      const sitesRes = await getAllSites();
-      setSites(sitesRes);
-    } catch (error) {
-      console.error("Failed to fetch sites:", error);
-    }
-  };
-
-  useEffect(() => {
-    const checkTokenAndFetchSites = async () => {
-      if (localStorage.getItem("token")) {
-        setLoggedIn(true);
-      } else {
-        await fetchSitesData();
-      }
-    };
-
-    checkTokenAndFetchSites();
-  }, []);
-
-  useEffect(() => {
-    if (loggedIn) {
-      navigate("/webcam");
-    }
-  }, [loggedIn, navigate]);
-
-  const onChange = (e) => {
-    const { name, value } = e.target;
-    setFormState((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
-
-  const submitForm = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const { username, password, site } = formState;
+    setLoading(true);
 
     try {
-      const res = await authUser({ username, password });
-      if (!res.username) {
-        alert("Invalid username or password");
-      } else if (res.username === username && res.password === password) {
-        localStorage.setItem("site-id", site);
-        localStorage.setItem("token", res.jwt);
-        setLoggedIn(true);
+      const response = await loginUser({ phone, password });
+      if (response.user) {
+        // Save eid to local storage
+        localStorage.setItem('eid', response.user.eid);
+        // Navigate to the user details page or home page after successful login
+        navigate('/user', { state: { eid: response.user.eid } });
       } else {
-        alert("Server error");
+        setError(response.message);
       }
-    } catch (error) {
-      console.error("Error during authentication", error);
+    } catch (err) {
+      setError("Error logging in. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <>
-      <div className="heading">BAC भारत</div>
-      <div className="container">
-        <div className="card">
-          <h1 className="heading-text">LogIn</h1>
-          <form onSubmit={submitForm}>
-            <div className="form-group">
-              <label htmlFor="user_login">Username</label>
-              <input
-                type="text"
-                name="username"
-                id="user_login"
-                value={formState.username}
-                onChange={onChange}
-                placeholder="username"
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="user_pass">Password</label>
-              <input
-                type="password"
-                name="password"
-                id="user_pass"
-                value={formState.password}
-                onChange={onChange}
-                placeholder="password"
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="site">Select Site</label>
-              <select
-                name="site"
-                id="site"
-                value={formState.site}
-                required
-                onChange={onChange}
-              >
-                <option value="">Select Site</option>
-                {sites.map((site) => (
-                  <option key={site.id} value={site.id}>
-                    {site.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="form-group">
-              <input type="submit" className="submit" value="Sign In" />
-            </div>
-          </form>
+    <div className="login-container">
+      <h2>Login</h2>
+      {error && <div className="error-message">{error}</div>}
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="phone">Phone:</label>
+          <input
+            type="text"
+            id="phone"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            required
+          />
         </div>
-      </div>
-    </>
+        <div className="form-group">
+          <label htmlFor="password">Password:</label>
+          <input
+            type="password"
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        <button type="submit" disabled={loading}>
+          {loading ? 'Logging in...' : 'Login'}
+        </button>
+      </form>
+    </div>
   );
 };
 
