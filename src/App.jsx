@@ -14,7 +14,7 @@ function App() {
       <Routes>
         <Route path="/" element={<PublicRoute element={Home} />} />
         <Route path="/login" element={<PublicRoute element={Login} />} />
-        <Route path="/webcam" element={<ProtectedRoute element={WebcamDetection} />} />
+        <Route path="/webcam" element={<PublicRoute element={WebcamDetection} />} />
         <Route path="/create" element={<PublicRoute element={Create} />} />
         <Route path="/user" element={<ProtectedRoute element={User} />} />
       </Routes>
