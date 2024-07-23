@@ -90,6 +90,9 @@ const WebcamDetection = () => {
             alert("Attendance Marked");
             navigate("/user"); // Navigate to the root URL
           });
+        }else{
+          alert("Face Not Matched");
+            navigate("/"); // Navigate to the root URL
         }
       }).catch((error) => {
         console.error("Error posting attendance:", error);
