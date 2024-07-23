@@ -5,18 +5,17 @@ import AttendanceList from './Components/AttendanceList';
 import User from './Components/User';
 import Home from './Components/Home';
 import Create from './Components/Create';
-import { ProtectedRoute, PublicRoute } from './Components/ProtectedRoute';
 import './App.css';
-//testing
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<PublicRoute element={Home} />} />
-        <Route path="/login" element={<PublicRoute element={Login} />} />
-        <Route path="/webcam" element={<PublicRoute element={WebcamDetection} />} />
-        <Route path="/create" element={<PublicRoute element={Create} />} />
-        <Route path="/user" element={<ProtectedRoute element={User} />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/webcam" element={<WebcamDetection />} />
+        <Route path="/create" element={<Create/>} />
+        <Route path="/user" element={<User/>} />
       </Routes>
     </BrowserRouter>
   );
