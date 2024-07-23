@@ -54,7 +54,7 @@ const Create = () => {
 
   return (
     <div className="create-container">
-      <h2>Upload User Data</h2>
+      <h2>Upload Player Data</h2>
       <form onSubmit={handleSubmit} className="create-form">
         <input
           type="text"
