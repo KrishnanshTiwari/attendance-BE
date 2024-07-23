@@ -78,6 +78,8 @@ const WebcamDetection = () => {
         setAttendance(res);
         if (res.results?.eid) {
           // Save token in local storage
+          const currentTime = new Date().toLocaleString().replace(/[: ]/g, "");
+          const tokenKey = `${res.results.eid}_${currentTime}`;
           const token = {
             time: new Date().toLocaleString(),
             latitude: null,
@@ -86,7 +88,7 @@ const WebcamDetection = () => {
           navigator.geolocation.getCurrentPosition((position) => {
             token.latitude = position.coords.latitude;
             token.longitude = position.coords.longitude;
-            localStorage.setItem(res.results.eid, JSON.stringify(token));
+            localStorage.setItem(tokenKey, JSON.stringify(token));
             alert("Attendance Marked");
             navigate("/user"); // Navigate to the root URL
           });
