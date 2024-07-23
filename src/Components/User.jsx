@@ -63,7 +63,7 @@ const User = () => {
 
   return (
     <div className="user-container">
-      <h2>User Details</h2>
+      <h2>Player Details</h2>
       <div className="user-info">
         <div className="info-item"><strong>ID:</strong> {user.eid}</div>
         <div className="info-item"><strong>First Name:</strong> {user.first_name}</div>
