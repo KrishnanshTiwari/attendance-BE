@@ -8,7 +8,7 @@ const User = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [attendanceStatus, setAttendanceStatus] = useState(null);
+  const [attendanceStatuses, setAttendanceStatuses] = useState([]);
 
   useEffect(() => {
     // Fetch user details when the component mounts
@@ -24,12 +24,16 @@ const User = () => {
         const userDetails = await getUserDetails(eid);
         setUser(userDetails);
 
-        // Check if attendance is marked
-        const token = localStorage.getItem(eid);
-        if (token) {
-          const { time, latitude, longitude } = JSON.parse(token);
-          setAttendanceStatus(`Attendance marked at ${time} (Lat: ${latitude}, Lon: ${longitude})`);
+        // Fetch attendance statuses
+        const attendanceList = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key.startsWith(eid)) {
+            const { time, latitude, longitude } = JSON.parse(localStorage.getItem(key));
+            attendanceList.push(`Attendance marked at ${time} (Lat: ${latitude}, Lon: ${longitude})`);
+          }
         }
+        setAttendanceStatuses(attendanceList);
       } catch (error) {
         setError("Error fetching user details");
       } finally {
@@ -63,7 +67,7 @@ const User = () => {
 
   return (
     <div className="user-container">
-      <h2>Player Details</h2>
+      <h2>User Details</h2>
       <div className="user-info">
         <div className="info-item"><strong>ID:</strong> {user.eid}</div>
         <div className="info-item"><strong>First Name:</strong> {user.first_name}</div>
@@ -76,17 +80,19 @@ const User = () => {
         <div className="info-item"><strong>Sports:</strong> {user.sports_name}</div>
       </div>
       <div className="actions">
-        {attendanceStatus ? (
-          <p className="attendance-status">{attendanceStatus}</p>
-        ) : (
-          <button onClick={handleMarkAttendance} className="mark-attendance-btn">Mark Attendance</button>
-        )}
+        <button onClick={handleMarkAttendance} className="mark-attendance-btn">Mark Attendance</button>
         <button onClick={handleLogout} className="logout-btn">Logout</button>
       </div>
+      {attendanceStatuses.length > 0 && (
+        <div className="attendance-statuses">
+          <h3>Attendance Status:</h3>
+          {attendanceStatuses.map((status, index) => (
+            <p key={index} className="attendance-status">{status}</p>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
-
-
 
 export default User;
