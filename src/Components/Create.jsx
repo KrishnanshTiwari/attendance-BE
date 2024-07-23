@@ -18,6 +18,8 @@ const Create = () => {
     image: null,
   });
 
+  const [imageName, setImageName] = useState("");
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -33,6 +35,7 @@ const Create = () => {
       ...formData,
       image: e.target.files[0],
     });
+    setImageName(e.target.files[0].name);
   };
 
   const handleSubmit = async (e) => {
@@ -150,6 +153,7 @@ const Create = () => {
             onChange={handleFileChange}
             required
           />
+          {imageName && <p>Selected file: {imageName}</p>}
         </div>
         <button type="submit">Submit</button>
       </form>
