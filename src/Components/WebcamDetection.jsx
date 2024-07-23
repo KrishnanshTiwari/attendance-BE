@@ -17,7 +17,7 @@ const WebcamDetection = () => {
 
   useEffect(() => {
     const loadModels = async () => {
-      if (!localStorage.getItem("token")) navigate("/");
+      //if (!localStorage.getItem("token")) navigate("/");
       try {
         await Promise.all([
           faceapi.nets.tinyFaceDetector.loadFromUri("/models/tiny_face_detector"),
@@ -88,7 +88,7 @@ const WebcamDetection = () => {
             token.longitude = position.coords.longitude;
             localStorage.setItem(res.results.eid, JSON.stringify(token));
             alert("Attendance Marked");
-            navigate("/"); // Navigate to the root URL
+            navigate("/user"); // Navigate to the root URL
           });
         }
       }).catch((error) => {
@@ -114,45 +114,15 @@ const WebcamDetection = () => {
       if (window.confirm("Are you sure you want to logout?")) {
         localStorage.removeItem("token");
         localStorage.removeItem("site-id");
-        navigate("/");
+        //navigate("/");
       }
     }
   };
-
+  console.log("web cam intiated")
   return (
     <>
       <div className="header">
-        <span className="back-btn">BAC भारत</span>
-        <div className={`dropdown`}>
-          <button
-            onClick={() => setDropdownState(!dropdownState)}
-            className="dropdown-btn"
-          >
-            <i className="fa-solid fa-list"></i>
-          </button>
-          <div
-            className={`dropdown-items ${
-              dropdownState ? "isVisible" : "isHidden"
-            }`}
-          >
-            <div
-              className="dropdown-item"
-              onClick={() => handleDropdown("/attendances")}
-            >
-              <div className="dropdown__link">
-                <i className="fa-solid fa-list"></i> Attendance list
-              </div>
-            </div>
-            <div className="dropdown-item">
-              <div
-                className="dropdown__link"
-                onClick={() => handleDropdown(false)}
-              >
-                <i className="fa-solid fa-right-from-bracket"></i> Logout
-              </div>
-            </div>
-          </div>
-        </div>
+        <span className="back-btn">Face-Attendance</span>
       </div>
       <div className="webcam-container">
         <Webcam
